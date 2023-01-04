@@ -1,7 +1,7 @@
 const express = require('express');
 const path = require('path');
 const fs = require('fs');
-const notes = require('./db/notes');
+const util = require('util');
 const PORT = 3001;
 
 const app = express();
@@ -12,17 +12,20 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.static('public'));
 
 app.get('/', (req, res) =>
-  res.sendFile(path.join(__dirname, '/public/index.html'))
+  res.sendFile(path.join(__dirname, './public/index.html'))
 );
 
 app.get('/notes', (req, res) =>
-    res.sendFile(path.join(__dirname, '/public/notes.html'))
+    res.sendFile(path.join(__dirname, './public/notes.html'))
 );
 
+const readFromFile = util.promisify(fs.readFile);
+
 app.get('/api/notes', (req, res) => {
-  console.info(`GET /api/notes`);
-  res.status(200).json(notes);
+  console.info(`${req.method} request received for notes`);
+  readFromFile('./db/notes.json').then((inputData) => res.json(JSON.parse(inputData)))
 });
+
 
 app.post('/api/notes', (req, res) => {
   // Log that a POST request was received
@@ -30,33 +33,30 @@ app.post('/api/notes', (req, res) => {
 
   // // Destructuring assignment for the items in req.body
   const { title, text } = req.body;
-
+console.log('the body', req.body);
+  try {
   // // If all the required properties are present
-  if (title && text) {
+  // if (title && text) {
     // Variable for the object we will save
+
+  const inputData = JSON.parse(fs.readFileSync('./db/notes.json'));
+
     const newNote = {
       title,
       text
     };
+console.log('new note', { title, text});
+ inputData.push(newNote)
 
-    const noteString = JSON.stringify(newNote);
- 
-    fs.writeFile(`./db/${newNote.product}.json`, noteString, (err) =>
-    err
-      ? console.error(err)
-      : console.log(
-          `Review for ${newNote.product} has been written to JSON file`
-        )
-  );
-  const response = {
-    status: 'success',
-    body: newNote,
-  };
-
-  console.log(response);
-  res.status(201).json(response);
-} else {
-  res.status(500).json('Error in posting review');
+ fs.writeFileSync('./db/notes.json', JSON.stringify(inputData))
+  console.log(inputData);
+  res.status(201).json(inputData);
+  
+// } else {
+//   res.status(500).json('Error in posting review');
+// }
+} catch(err) { 
+  console.error(err);
 }
 });
 
