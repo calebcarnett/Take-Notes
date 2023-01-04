@@ -23,7 +23,7 @@ const readFromFile = util.promisify(fs.readFile);
 
 app.get('/api/notes', (req, res) => {
   console.info(`${req.method} request received for notes`);
-  readFromFile('./db/notes.json').then((inputData) => res.json(JSON.parse(inputData)))
+readFromFile('./db/notes.json').then((data) => res.json(JSON.parse(data)))
 });
 
 
@@ -34,29 +34,24 @@ app.post('/api/notes', (req, res) => {
   // // Destructuring assignment for the items in req.body
   const { title, text } = req.body;
 console.log('the body', req.body);
-  try {
+
   // // If all the required properties are present
-  // if (title && text) {
+  if (title && text) {
     // Variable for the object we will save
-
-  const inputData = JSON.parse(fs.readFileSync('./db/notes.json'));
-
     const newNote = {
       title,
       text
     };
-console.log('new note', { title, text});
- inputData.push(newNote)
 
- fs.writeFileSync('./db/notes.json', JSON.stringify(inputData))
-  console.log(inputData);
-  res.status(201).json(inputData);
+  const data = JSON.parse(fs.readFileSync('./db/notes.json', "utf8"))
+
+  data.push(newNote);
+
+ fs.writeFileSync('./db/notes.json', JSON.stringify(data))
+  res.status(201).json(data);
   
-// } else {
-//   res.status(500).json('Error in posting review');
-// }
-} catch(err) { 
-  console.error(err);
+} else {
+  res.status(500).json('Error in posting review');
 }
 });
 
