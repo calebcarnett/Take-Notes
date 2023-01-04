@@ -58,6 +58,11 @@ app.post("/api/notes", (req, res) => {
   }
 });
 
+app.delete("/api/notes/:id", (req, res) => {
+  console.info(`${req.method} request received for notes`);
+
+});
+
 app.listen(PORT, () => {
   console.log(`app listening at http://localhost:${PORT} 🚀`);
 });

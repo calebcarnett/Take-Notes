@@ -182,3 +182,5 @@ if (window.location.pathname === '/notes') {
 }
 
 getAndRenderNotes();
+
+
