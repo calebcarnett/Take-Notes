@@ -15,6 +15,7 @@ This is a web application that is designed write and save your study notes!
 - Write a note in the text box (You won't be able to save your not without a title and text)
 - Click Save and press the plus button to add a new note!
 - You can always click on a previously saved notes to view its contents!
+- click on the trash icon if you need to delete a saved note
   
  ## Deployed Application
 https://takenotes.herokuapp.com/
