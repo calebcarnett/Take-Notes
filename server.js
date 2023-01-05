@@ -30,6 +30,8 @@ app.get("/api/notes", (req, res) => {
 // Promise version of fs.readFile
 const readFromFile = util.promisify(fs.readFile);
 // POST Route for a new notes
+
+const data = JSON.parse(fs.readFileSync("./db/notes.json", "utf8"));
 app.post("/api/notes", (req, res) => {
   // Log that a POST request was received
   console.info(`${req.method} request received to add a note`);
@@ -47,7 +49,7 @@ app.post("/api/notes", (req, res) => {
       id: uuid(),
     };
     //converted notes.json into an object and assigned a data constant
-    const data = JSON.parse(fs.readFileSync("./db/notes.json", "utf8"));
+    // const data = JSON.parse(fs.readFileSync("./db/notes.json", "utf8"));
     //pushed the newly added note to notes.json file
     data.push(newNote);
     //writes to file notes.json, stringify changes the data in the object to a string
@@ -60,9 +62,23 @@ app.post("/api/notes", (req, res) => {
 
 app.delete("/api/notes/:id", (req, res) => {
   console.info(`${req.method} request received for notes`);
-
+  // loop through notes.json
+  for (let i = 0; i < data.length; i++) {
+//  if any of the notes has an id that is equal to the id we want to delete
+    if (data[i].id == req.params.id) {
+      // then splice that index and only that index(1) out of the array
+      data.splice(i, 1);
+      fs.writeFileSync(
+        path.join(__dirname, "./db/notes.json"),
+        JSON.stringify(data)
+      );
+      break;
+    }
+  }
+  res.json(true);
 });
 
 app.listen(PORT, () => {
   console.log(`app listening at http://localhost:${PORT} 🚀`);
+  const data = JSON.parse(fs.readFileSync("./db/notes.json", "utf8"));
 });
